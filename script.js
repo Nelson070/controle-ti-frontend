@@ -1,34 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
   loadInitialData();
-  document
-    .getElementById("itemForm")
-    .addEventListener("submit", handleFormSubmit);
-  document
-    .getElementById("userForm")
-    .addEventListener("submit", handleUserSubmit);
+  document.getElementById("itemForm").addEventListener("submit", handleFormSubmit);
+  document.getElementById("userForm").addEventListener("submit", handleUserSubmit);
 });
 
 let usuarios = [];
 let itensCadastrados = [];
 
-// Tabs
 function openTab(tabId) {
-  document
-    .querySelectorAll(".tab-content")
-    .forEach((tab) => tab.classList.remove("active"));
-  document
-    .querySelectorAll(".tab")
-    .forEach((tab) => tab.classList.remove("bg-white", "shadow"));
+  document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("bg-white", "shadow"));
   document.getElementById(tabId).classList.add("active");
   event.target.classList.add("bg-white", "shadow");
 }
 
-// Carregar dados do backend
 async function loadInitialData() {
   try {
     const [usuariosRes, itensRes] = await Promise.all([
-      fetch("https://controle-ti-api.onrender.com/api/usuarios"),
-      fetch("https://controle-ti-api.onrender.com/api/itens"),
+      fetch("https://controle-ti-backend.onrender.com/api/usuarios"),
+      fetch("https://controle-ti-backend.onrender.com/api/itens")
     ]);
 
     usuarios = await usuariosRes.json();
@@ -43,12 +33,11 @@ async function loadInitialData() {
   }
 }
 
-// Atualizar datalist e lista de usuários
 function updateUserDatalist() {
   const usersDatalist = document.getElementById("users");
   if (!usersDatalist) return;
   usersDatalist.innerHTML = "";
-  usuarios.forEach((user) => {
+  usuarios.forEach(user => {
     usersDatalist.innerHTML += `<option value="${user.nome}" data-id="${user._id}">`;
   });
 }
@@ -58,11 +47,16 @@ function updateUserList() {
   if (!list) return;
   list.innerHTML = "";
   usuarios.forEach((user) => {
-    list.innerHTML += `<li>${user.nome} - ${user.setor}</li>`;
+    list.innerHTML += `
+      <li>
+        ${user.nome} - ${user.setor}
+        <button onclick="excluirUsuario('${user._id}')" class="text-red-600 underline ml-2">Excluir</button>
+      </li>
+    `;
   });
 }
 
-// Cadastrar novo usuário via API
+
 async function handleUserSubmit(e) {
   e.preventDefault();
   const nome = document.getElementById("userName").value.trim();
@@ -73,7 +67,7 @@ async function handleUserSubmit(e) {
     const res = await fetch("https://controle-ti-backend.onrender.com/api/usuarios", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, setor }),
+      body: JSON.stringify({ nome, setor })
     });
     const novoUsuario = await res.json();
     usuarios.push(novoUsuario);
@@ -86,7 +80,6 @@ async function handleUserSubmit(e) {
   }
 }
 
-// Cadastrar novo item via API
 async function handleFormSubmit(event) {
   event.preventDefault();
   const form = event.target;
@@ -111,7 +104,7 @@ async function handleFormSubmit(event) {
 
   try {
     if (id) {
-      const res = await fetch(`https://controle-ti-backend.onrender.com/api/itens${id}`, {
+      const res = await fetch(`https://controle-ti-backend.onrender.com/api/itens/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -140,17 +133,11 @@ async function handleFormSubmit(event) {
   }
 }
 
-
-//dashboard
 function atualizarDashboard() {
   const total = itensCadastrados.length;
-  const emUso = itensCadastrados.filter((i) => i.status === "Em uso").length;
-  const disponivel = itensCadastrados.filter(
-    (i) => i.status === "Disponível"
-  ).length;
-  const manutencao = itensCadastrados.filter(
-    (i) => i.status === "Manutenção"
-  ).length;
+  const emUso = itensCadastrados.filter(i => i.status === "Em uso").length;
+  const disponivel = itensCadastrados.filter(i => i.status === "Disponível").length;
+  const manutencao = itensCadastrados.filter(i => i.status === "Manutenção").length;
 
   document.getElementById("dashTotalItens").textContent = total;
   document.getElementById("dashEmUso").textContent = emUso;
@@ -160,11 +147,10 @@ function atualizarDashboard() {
 
 loadInitialData().then(() => atualizarDashboard());
 
-// Atualizar tabela
 function updateReportTable(itens) {
   const reportList = document.getElementById("reportList");
   reportList.innerHTML = "";
-  itens.forEach((item) => {
+  itens.forEach(item => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td class="px-3 py-2 text-sm border-t">${item.nome}</td>
@@ -175,29 +161,36 @@ function updateReportTable(itens) {
       <td class="px-3 py-2 text-sm border-t">${item.data}</td>
       <td class="px-3 py-2 text-sm border-t">${item.status}</td>
       <td class="px-3 py-2 text-sm border-t">${item.observacoes || ""}</td>
-       <td>
-    <button onclick="editarItem('${
-      item._id
-    }')" class="text-blue-600 underline">Editar</button>
-    <button onclick="excluirItem('${
-      item._id
-    }')" class="text-red-600 underline ml-2">Excluir</button>
-  </td>
+      <td>
+        <button onclick="editarItem('${item._id}')" class="text-blue-600 underline">Editar</button>
+        <button onclick="excluirItem('${item._id}')" class="text-red-600 underline ml-2">Excluir</button>
+      </td>
     `;
     reportList.appendChild(row);
   });
 }
 
-//adicionar e excluir itens
 function excluirItem(id) {
+  if (!id || typeof id !== 'string') {
+    alert("ID inválido para exclusão.");
+    return;
+  }
+
   if (!confirm("Tem certeza que deseja excluir este item?")) return;
-  fetch(`https://controle-ti-backend.onrender.com/api/itens${id}`, {
-    method: "DELETE"
-  }).then(() => {
-    itensCadastrados = itensCadastrados.filter(i => i._id !== id);
-    updateReportTable(itensCadastrados);
-    atualizarDashboard();
-  }).catch(err => alert("Erro ao excluir item."));
+
+  fetch(`https://controle-ti-backend.onrender.com/api/itens/${id}`, {
+    method: 'DELETE'
+  })
+    .then(response => {
+      if (!response.ok) throw new Error("Erro ao excluir item.");
+      itensCadastrados = itensCadastrados.filter(item => item._id !== id);
+      updateReportTable(itensCadastrados);
+      atualizarDashboard?.();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Erro ao excluir item do servidor.");
+    });
 }
 
 function editarItem(id) {
@@ -216,20 +209,17 @@ function editarItem(id) {
   document.getElementById('itemForm').dataset.editing = id;
 }
 
-
-// Filtro de mês
 function generateReport() {
   const selectedMonth = document.getElementById("reportMonth").value;
   const filtered = selectedMonth
-    ? itensCadastrados.filter((item) => item.data.startsWith(selectedMonth))
+    ? itensCadastrados.filter(item => item.data.startsWith(selectedMonth))
     : itensCadastrados;
   updateReportTable(filtered);
 }
 
-// Exportar CSV
 function exportToCSV() {
   let csv = "Nome,Tipo,Série,Setor,Usuário,Data,Status\n";
-  itensCadastrados.forEach((item) => {
+  itensCadastrados.forEach(item => {
     csv += `${item.nome},${item.tipo},${item.numero_serie},${item.setor_id},${item.usuario_nome},${item.data},${item.status}\n`;
   });
   const blob = new Blob([csv], { type: "text/csv" });
@@ -239,3 +229,26 @@ function exportToCSV() {
   link.click();
 }
 
+function excluirUsuario(id) {
+  if (!id || typeof id !== "string") {
+    alert("ID inválido para exclusão.");
+    return;
+  }
+
+  if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
+
+  fetch(`https://controle-ti-backend.onrender.com/api/usuarios/${id}`, {
+    method: "DELETE"
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Erro ao excluir usuário.");
+      usuarios = usuarios.filter((u) => u._id !== id);
+      updateUserList();
+      updateUserDatalist();
+      alert("Usuário excluído com sucesso!");
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Erro ao excluir usuário do servidor.");
+    });
+}
