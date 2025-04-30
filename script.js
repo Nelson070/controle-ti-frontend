@@ -237,7 +237,7 @@ function excluirUsuario(id) {
 
   if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
 
-  fetch(`https://controle-ti-backend.onrender.com/api/usuarios/${id}`, {
+  fetch(`https://controle-ti-backend.onrender.com/api/itens/${id}`, {
     method: "DELETE"
   })
     .then((response) => {
