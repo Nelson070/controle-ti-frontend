@@ -27,8 +27,8 @@ function openTab(tabId) {
 async function loadInitialData() {
   try {
     const [usuariosRes, itensRes] = await Promise.all([
-      fetch("http://localhost:3000/api/usuarios"),
-      fetch("http://localhost:3000/api/itens"),
+      fetch("https://controle-ti-api.onrender.com/api/usuarios"),
+      fetch("https://controle-ti-api.onrender.com/api/itens"),
     ]);
 
     usuarios = await usuariosRes.json();
@@ -70,7 +70,7 @@ async function handleUserSubmit(e) {
   if (!nome || !setor) return alert("Preencha todos os campos");
 
   try {
-    const res = await fetch("http://localhost:3000/api/usuarios", {
+    const res = await fetch("https://controle-ti-api.onrender.com/api/usuarios", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, setor }),
@@ -111,7 +111,7 @@ async function handleFormSubmit(event) {
 
   try {
     if (id) {
-      const res = await fetch(`http://localhost:3000/api/itens/${id}`, {
+      const res = await fetch(`https://controle-ti-api.onrender.com/api/itens/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -121,7 +121,7 @@ async function handleFormSubmit(event) {
       itensCadastrados[idx] = atualizado;
       alert("Item atualizado com sucesso!");
     } else {
-      const res = await fetch('http://localhost:3000/api/itens', {
+      const res = await fetch('https://controle-ti-api.onrender.com/api/itens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -191,7 +191,7 @@ function updateReportTable(itens) {
 //adicionar e excluir itens
 function excluirItem(id) {
   if (!confirm("Tem certeza que deseja excluir este item?")) return;
-  fetch(`http://localhost:3000/api/itens/${id}`, {
+  fetch(`https://controle-ti-api.onrender.com/api/itens/${id}`, {
     method: "DELETE"
   }).then(() => {
     itensCadastrados = itensCadastrados.filter(i => i._id !== id);
@@ -238,3 +238,4 @@ function exportToCSV() {
   link.download = "relatorio_itens.csv";
   link.click();
 }
+
