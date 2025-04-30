@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Itens de TI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 px-4 py-6">
+  <h1 class="text-3xl font-bold mb-6 text-center text-red-700">Controle TI Maquisul</h1>
+
+  <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-sm text-white">
+    <div class="bg-blue-600 p-4 rounded shadow">
+      <h3 class="font-bold">Total de Itens</h3>
+      <p id="dashTotalItens" class="text-xl">0</p>
+    </div>
+    <div class="bg-green-600 p-4 rounded shadow">
+      <h3 class="font-bold">Itens em Uso</h3>
+      <p id="dashEmUso" class="text-xl">0</p>
+    </div>
+    <div class="bg-yellow-600 p-4 rounded shadow">
+      <h3 class="font-bold">Itens Disponíveis</h3>
+      <p id="dashDisponivel" class="text-xl">0</p>
+    </div>
+    <div class="bg-red-600 p-4 rounded shadow">
+      <h3 class="font-bold">Itens em Manutenção</h3>
+      <p id="dashManutencao" class="text-xl">0</p>
+    </div>
+  </div>
+  
+  <div class="flex space-x-4 mb-6 justify-center">
+    <div class="px-4 py-2 rounded-t-lg cursor-pointer bg-white shadow text-sm font-medium" onclick="openTab('itens')">Itens</div>
+  </div>
+
+  <div class="tab-content active" id="itens">
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold mb-4">Cadastrar Novo Item</h2>
+      <form id="itemForm">
+        <div class="mb-4">
+          <label for="itemName" class="block text-sm font-semibold mb-1">Nome do Item:</label>
+          <input id="itemName" type="text" required class="w-full p-2 border border-gray-300 rounded" />
+        </div>
+
+        <div class="mb-4">
+          <label for="itemType" class="block text-sm font-semibold mb-1">Tipo:</label>
+          <select id="itemType" required class="w-full p-2 border border-gray-300 rounded">
+            <option value="">Selecione...</option>
+            <option value="SSD">Periféricos</option>
+            <option value="Placa Mãe">Placa Mãe</option>
+            <option value="Monitor">Monitor</option>
+            <option value="CPU">CPU</option>
+            <option value="Memória RAM">Memória RAM</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label for="itemUser" class="block text-sm font-semibold mb-1">Usuário Responsável:</label>
+          <input id="itemUser" type="text" list="users" class="w-full p-2 border border-gray-300 rounded" />
+          <datalist id="users"></datalist>
+        </div>
+
+        <div class="mb-4">
+          <label for="itemSector" class="block text-sm font-semibold mb-1">Setor:</label>
+          <select id="itemSector" required class="w-full p-2 border border-gray-300 rounded">
+            <option value="">Selecione...</option>
+            <option value="Gerencia">Gerência</option>
+            <option value="Vendas">Vendas</option>
+            <option value="Compras">Compras</option>
+            <option value="Contabilidade">Contabilidade</option>
+            <option value="RH">RH</option>
+            <option value="Deposito">Depósito</option>
+            <option value="Cadastro">Cadastro</option>
+            <option value="Faturamento">Faturamento</option>
+            <option value="Comercial">Comercial</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label for="itemSerial" class="block text-sm font-semibold mb-1">Número de Série:</label>
+          <input id="itemSerial" type="text" class="w-full p-2 border border-gray-300 rounded" />
+        </div>
+
+        <div class="mb-4">
+          <label for="itemDate" class="block text-sm font-semibold mb-1">Data de Cadastro:</label>
+          <input id="itemDate" type="date" required class="w-full p-2 border border-gray-300 rounded" />
+        </div>
+
+        <div class="mb-4">
+          <label for="itemObs" class="block text-sm font-semibold mb-1">Observações:</label>
+          <textarea id="itemObs" class="w-full p-2 border border-gray-300 rounded"></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label for="itemStatus" class="block text-sm font-semibold mb-1">Status:</label>
+          <select id="itemStatus" class="w-full p-2 border border-gray-300 rounded">
+            <option value="Disponível">Disponível</option>
+            <option value="Em uso">Em uso</option>
+            <option value="Manutenção">Manutenção</option>
+          </select>
+        </div>
+
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">Cadastrar Item</button>
+      </form>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold mb-4">Relatório Mensal</h2>
+      <div class="flex gap-4 mb-4">
+        <input id="reportMonth" type="month" class="p-2 border border-gray-300 rounded" />
+        <button onclick="generateReport()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">Gerar Relatório</button>
+        <button onclick="exportToCSV()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded shadow">Exportar para CSV</button>
+      </div>
+      <table id="reportTable" class="w-full text-sm mt-4 border border-gray-300">
+        <thead class="bg-gray-200 text-gray-700">
+          <tr>
+            <th class="px-3 py-2 text-left text-sm font-medium">Nome</th>
+            <th class="px-3 py-2 text-left text-sm font-medium">Tipo</th>
+            <th class="px-3 py-2 text-left text-sm font-medium">Série</th>
+            <th class="px-3 py-2 text-left text-sm font-medium">Setor</th>
+            <th class="px-3 py-2 text-left text-sm font-medium">Usuário</th>
+            <th class="px-3 py-2 text-left text-sm font-medium">Data</th>
+            <th class="px-3 py-2 text-left text-sm font-medium">Status</th>
+            <th class="px-3 py-2 text-left text-sm font-medium">Observações</th>
+          </tr>
+        </thead>
+        <tbody id="reportList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  
+<div class="tab-content" id="usuarios">
+  <div class="bg-white p-6 rounded-lg shadow mb-6">
+    <h2 class="text-xl font-semibold mb-4">Cadastrar Novo Usuário</h2>
+    <form id="userForm">
+      <div class="mb-4">
+        <label for="userName" class="block text-sm font-semibold mb-1">Nome do Usuário:</label>
+        <input id="userName" type="text" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+      <div class="mb-4">
+        <label for="userSector" class="block text-sm font-semibold mb-1">Setor:</label>
+        <select id="userSector" required class="w-full p-2 border border-gray-300 rounded">
+          <option value="">Selecione...</option>
+          <option value="Gerencia">Gerência</option>
+          <option value="Vendas">Vendas</option>
+          <option value="Compras">Compras</option>
+          <option value="Contabilidade">Contabilidade</option>
+          <option value="RH">RH</option>
+          <option value="Deposito">Depósito</option>
+          <option value="Comercial">Comercial</option>
+          <option value="Cadastro">Cadastro</option>
+          <option value="Faturamento">Faturamento</option>
+        </select>
+      </div>
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">Cadastrar Usuário</button>
+    </form>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow">
+    <h2 class="text-xl font-semibold mb-4">Usuários Cadastrados</h2>
+    <ul id="userList" class="list-disc pl-5 space-y-1 text-sm text-gray-700"></ul>
+  </div>
+</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
